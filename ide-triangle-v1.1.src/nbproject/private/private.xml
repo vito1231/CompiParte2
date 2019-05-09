@@ -2,6 +2,11 @@
 <project-private xmlns="http://www.netbeans.org/ns/project-private/1">
     <editor-bookmarks xmlns="http://www.netbeans.org/ns/editor-bookmarks/2" lastBookmarkId="0"/>
     <open-files xmlns="http://www.netbeans.org/ns/projectui-open-files/2">
-        <group/>
+        <group>
+            <file>file:/E:/Workspace/Compiladores/CompiEnGrupo/Working/CompiParte2/ide-triangle-v1.1.src/src/Triangle/ContextualAnalyzer/IdentificationTable.java</file>
+            <file>file:/E:/Workspace/Compiladores/CompiEnGrupo/Working/CompiParte2/ide-triangle-v1.1.src/src/Triangle/ContextualAnalyzer/IdEntry.java</file>
+            <file>file:/E:/Workspace/Compiladores/CompiEnGrupo/Working/CompiParte2/ide-triangle-v1.1.src/src/Triangle/AbstractSyntaxTrees/IfCommand.java</file>
+            <file>file:/E:/Workspace/Compiladores/CompiEnGrupo/Working/CompiParte2/ide-triangle-v1.1.src/src/Triangle/ContextualAnalyzer/Checker.java</file>
+        </group>
     </open-files>
 </project-private>

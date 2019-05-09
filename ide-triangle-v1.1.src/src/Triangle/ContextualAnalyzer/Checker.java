@@ -107,10 +107,12 @@ import Triangle.SyntacticAnalyzer.SourcePosition;
 
 public final class Checker implements Visitor {
 
+    
+  // <editor-fold desc=" Visitor ">
   // Commands
 
   // Always returns null. Does not use the given object.
-
+  // <editor-fold defaultstate="collapsed" desc=" Commands ">
   public Object visitAssignCommand(AssignCommand ast, Object o) {
     TypeDenoter vType = (TypeDenoter) ast.V.visit(this, null);
     TypeDenoter eType = (TypeDenoter) ast.E.visit(this, null);
@@ -146,7 +148,8 @@ public final class Checker implements Visitor {
     if (! eType.equals(StdEnvironment.booleanType))
       reporter.reportError("Boolean expression expected here", "", ast.E.position);
     ast.C1.visit(this, null);
-    ast.C2.visit(this, null);
+    ast.C2.visit(this, null);//if not else should be empty command
+    
     return null;
   }
 
@@ -156,6 +159,7 @@ public final class Checker implements Visitor {
     ast.C.visit(this, null);
     idTable.closeScope();
     return null;
+    
   }
 
   public Object visitSequentialCommand(SequentialCommand ast, Object o) {
@@ -203,7 +207,7 @@ public final class Checker implements Visitor {
     if (! eType.equals(StdEnvironment.integerType))
       reporter.reportError("Integer expression expected here", "", ast.E.position);
     if (! e2Type.equals(StdEnvironment.integerType))
-      reporter.reportError("Integer expression expected here", "", ast.E.position);
+      reporter.reportError("Integer expression expected here", "", ast.E2.position);
     ast.C.visit(this, null);
     ast.I.visit(this, null);
     return null;
@@ -216,9 +220,9 @@ public final class Checker implements Visitor {
     if (! eType.equals(StdEnvironment.integerType))
       reporter.reportError("Integer expression expected here", "", ast.E.position);
     if (! e2Type.equals(StdEnvironment.integerType))
-      reporter.reportError("Integer expression expected here", "", ast.E.position);
+      reporter.reportError("Integer expression expected here", "", ast.E2.position);
     if (! e3Type.equals(StdEnvironment.booleanType))
-      reporter.reportError("Boolean expression expected here", "", ast.E.position);
+      reporter.reportError("Boolean expression expected here", "", ast.E3.position);
     ast.C.visit(this, null);
     ast.I.visit(this, null);
     return null;
@@ -231,20 +235,20 @@ public final class Checker implements Visitor {
     if (! eType.equals(StdEnvironment.integerType))
       reporter.reportError("Integer expression expected here", "", ast.E.position);
     if (! e2Type.equals(StdEnvironment.integerType))
-      reporter.reportError("Integer expression expected here", "", ast.E.position);
+      reporter.reportError("Integer expression expected here", "", ast.E2.position);
     if (! e3Type.equals(StdEnvironment.booleanType))
-      reporter.reportError("Boolean expression expected here", "", ast.E.position);
+      reporter.reportError("Boolean expression expected here", "", ast.E3.position);
     ast.C.visit(this, null);
     ast.I.visit(this, null);
     return null;
   }
-
+ // </editor-fold>
 
   // Expressions
 
   // Returns the TypeDenoter denoting the type of the expression. Does
   // not use the given object.
-
+  // <editor-fold defaultstate="collapsed" desc=" Expressions ">
   public Object visitArrayExpression(ArrayExpression ast, Object o) {
     TypeDenoter elemType = (TypeDenoter) ast.AA.visit(this, null);
     IntegerLiteral il = new IntegerLiteral(new Integer(ast.AA.elemCount).toString(),
@@ -365,14 +369,18 @@ public final class Checker implements Visitor {
     ast.type = (TypeDenoter) ast.V.visit(this, null);
     return ast.type;
   }
-
+ // </editor-fold>
   // Declarations
 
   // Always returns null. Does not use the given object.
+  // <editor-fold defaultstate="collapsed" desc=" Declarations ">
+
   public Object visitBinaryOperatorDeclaration(BinaryOperatorDeclaration ast, Object o) {
-    return null;
+ 
+      return null;
   }
 
+  
   public Object visitConstDeclaration(ConstDeclaration ast, Object o) {
     TypeDenoter eType = (TypeDenoter) ast.E.visit(this, null);
     idTable.enter(ast.I.spelling, ast);
@@ -418,6 +426,7 @@ public final class Checker implements Visitor {
 
   public Object visitTypeDeclaration(TypeDeclaration ast, Object o) {
     ast.T = (TypeDenoter) ast.T.visit(this, null);
+
     idTable.enter (ast.I.spelling, ast);
     if (ast.duplicated)
       reporter.reportError ("identifier \"%\" already declared",
@@ -438,12 +447,25 @@ public final class Checker implements Visitor {
 
     return null;
   }
-
+  
+  
+  @Override
+    public Object visitVarADeclaration(VarADeclaration ast, Object o) {
+        TypeDenoter vType = (TypeDenoter) ast.I.visit(this, null);
+        TypeDenoter eType = (TypeDenoter) ast.E.visit(this, null);
+        idTable.enter (ast.I.spelling, ast);
+         
+        if (! eType.equals(vType))
+            reporter.reportError ("assignment incompatibilty", "", ast.position);
+        return null;  
+    }
+    
+ // </editor-fold>
   // Array Aggregates
 
   // Returns the TypeDenoter for the Array Aggregate. Does not use the
   // given object.
-
+  // <editor-fold defaultstate="collapsed" desc=" Array Agregations ">
   public Object visitMultipleArrayAggregate(MultipleArrayAggregate ast, Object o) {
     TypeDenoter eType = (TypeDenoter) ast.E.visit(this, null);
     TypeDenoter elemType = (TypeDenoter) ast.AA.visit(this, null);
@@ -458,12 +480,12 @@ public final class Checker implements Visitor {
     ast.elemCount = 1;
     return elemType;
   }
-
+ // </editor-fold>
   // Record Aggregates
 
   // Returns the TypeDenoter for the Record Aggregate. Does not use the
   // given object.
-
+  // <editor-fold defaultstate="collapsed" desc=" Record Agregates ">
   public Object visitMultipleRecordAggregate(MultipleRecordAggregate ast, Object o) {
     TypeDenoter eType = (TypeDenoter) ast.E.visit(this, null);
     FieldTypeDenoter rType = (FieldTypeDenoter) ast.RA.visit(this, null);
@@ -480,11 +502,11 @@ public final class Checker implements Visitor {
     ast.type = new SingleFieldTypeDenoter(ast.I, eType, ast.position);
     return ast.type;
   }
-
+ // </editor-fold>
   // Formal Parameters
 
   // Always returns null. Does not use the given object.
-
+  // <editor-fold defaultstate="collapsed" desc=" Formal Parameters ">
   public Object visitConstFormalParameter(ConstFormalParameter ast, Object o) {
     ast.T = (TypeDenoter) ast.T.visit(this, null);
     idTable.enter(ast.I.spelling, ast);
@@ -540,11 +562,11 @@ public final class Checker implements Visitor {
     ast.FP.visit(this, null);
     return null;
   }
-
+ // </editor-fold>
   // Actual Parameters
 
   // Always returns null. Uses the given FormalParameter.
-
+  // <editor-fold defaultstate="collapsed" desc=" Actual Parameters ">
   public Object visitConstActualParameter(ConstActualParameter ast, Object o) {
     FormalParameter fp = (FormalParameter) o;
     TypeDenoter eType = (TypeDenoter) ast.E.visit(this, null);
@@ -660,9 +682,9 @@ public final class Checker implements Visitor {
     }
     return null;
   }
-
+ // </editor-fold>
   // Type Denoters
-
+  // <editor-fold defaultstate="collapsed" desc=" Type Denoters ">
   // Returns the expanded version of the TypeDenoter. Does not
   // use the given object.
 
@@ -721,8 +743,9 @@ public final class Checker implements Visitor {
     ast.T = (TypeDenoter) ast.T.visit(this, null);
     return ast;
   }
-
+ // </editor-fold>
   // Literals, Identifiers and Operators
+  // <editor-fold defaultstate="collapsed" desc=" Literals, Identifiers and Operators ">
   public Object visitCharacterLiteral(CharacterLiteral CL, Object o) {
     return StdEnvironment.charType;
   }
@@ -759,7 +782,7 @@ public final class Checker implements Visitor {
       O.decl = binding;
     return binding;
   }
-
+ // </editor-fold>
   // Value-or-variable names
 
   // Determines the address of a named object (constant or variable).
@@ -780,7 +803,7 @@ public final class Checker implements Visitor {
 
   // Returns the TypeDenoter of the Vname. Does not use the
   // given object.
-
+  // <editor-fold defaultstate="collapsed" desc=" Value or variable names ">
   public Object visitDotVname(DotVname ast, Object o) {
     ast.type = null;
     TypeDenoter vType = (TypeDenoter) ast.V.visit(this, null);
@@ -837,7 +860,7 @@ public final class Checker implements Visitor {
     }
     return ast.type;
   }
-
+ // </editor-fold>
   // Programs
 
   public Object visitProgram(Program ast, Object o) {
@@ -859,7 +882,7 @@ public final class Checker implements Visitor {
   public void check(Program ast) {
     ast.visit(this, null);
   }
-
+// </editor-fold>
   /////////////////////////////////////////////////////////////////////////////
 
   public Checker (ErrorReporter reporter) {
@@ -1044,6 +1067,8 @@ public final class Checker implements Visitor {
 
   
   
+  
+  
   //not implemented functions
 
     @Override
@@ -1127,10 +1152,5 @@ public final class Checker implements Visitor {
         return null;  
     }
 
-    @Override
-    public Object visitVarADeclaration(VarADeclaration aThis, Object o) {
-        aThis.I.visit(this, null);
-        aThis.E.visit(this, null);
-        return null;  
-    }
+    
 }

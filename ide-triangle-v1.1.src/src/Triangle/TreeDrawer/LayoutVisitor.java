@@ -160,7 +160,6 @@ public class LayoutVisitor implements Visitor {
     return layoutFive("UntilCom.",ast.I, ast.E, ast.E2, ast.E2, ast.C);
   }
   // </editor-fold>
-  
   // <editor-fold defaultstate="collapsed" desc=" Expressions ">
   // Expressions
   public Object visitArrayExpression(ArrayExpression ast, Object obj) {
@@ -207,7 +206,7 @@ public class LayoutVisitor implements Visitor {
     return layoutUnary("VnameExpr.", ast.V);
   }
   // </editor-fold>
-// <editor-fold defaultstate="collapsed" desc=" Declarations ">
+  // <editor-fold defaultstate="collapsed" desc=" Declarations ">
   // Declarations
   public Object visitBinaryOperatorDeclaration(BinaryOperatorDeclaration ast, Object obj) {
     return layoutQuaternary("Bin.Op.Decl.", ast.O, ast.ARG1, ast.ARG2, ast.RES);
@@ -240,7 +239,7 @@ public class LayoutVisitor implements Visitor {
   public Object visitVarDeclaration(VarDeclaration ast, Object obj) {
     return layoutBinary("VarDecl.", ast.I, ast.T);
   }
-
+  // </editor-fold>
   // <editor-fold defaultstate="collapsed" desc=" Aggregates ">
   // Array Aggregates
   public Object visitMultipleArrayAggregate(MultipleArrayAggregate ast, Object obj) {
@@ -653,7 +652,6 @@ public class LayoutVisitor implements Visitor {
         return layoutBinary("PrivateDeclaration", aThis.D1, aThis.D2);
         
     }
-
 
     @Override
     public Object ParDeclaration(Triangle.AbstractSyntaxTrees.ParDeclaration aThis, Object o) {
