@@ -150,14 +150,14 @@ public class LayoutVisitor implements Visitor {
     return layoutBinary("DoWhileCom.", ast.E, ast.C);
   }
   public Object visitForCommand(ForCommand ast, Object obj) {
-    return layoutQuaternary("UntilCom.", ast.I, ast.E, ast.E2, ast.C);
+    return layoutQuaternary("FromComm.", ast.I, ast.E, ast.E2, ast.C);
   }
   public Object visitForUntilCommand(ForUntilCommand ast, Object obj) {
-    return layoutFive("UntilCom.",ast.I, ast.E, ast.E2, ast.E2, ast.C);
+    return layoutFive("ForUntilCom.",ast.I, ast.E, ast.E2, ast.E2, ast.C);
   }
   
   public Object visitForWhileCommand(ForWhileCommand ast, Object obj) {
-    return layoutFive("UntilCom.",ast.I, ast.E, ast.E2, ast.E2, ast.C);
+    return layoutFive("ForWhileCom.",ast.I, ast.E, ast.E2, ast.E2, ast.C);
   }
   // </editor-fold>
   // <editor-fold defaultstate="collapsed" desc=" Expressions ">

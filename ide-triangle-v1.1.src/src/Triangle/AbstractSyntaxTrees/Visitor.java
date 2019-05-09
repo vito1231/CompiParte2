@@ -59,6 +59,8 @@ public interface Visitor {
   public abstract Object ProcFuncDeclaration(ProcFuncDeclaration aThis, Object o);
   public abstract Object RecursiveDeclaration(RecursiveDeclaration aThis, Object o);
   public abstract Object visitVarADeclaration(VarADeclaration aThis, Object o);
+  //public abstract Object visitForControlVarDeclaration(ForControlVarDeclaration ast, Object o);
+  
   // Array Aggregates
   public abstract Object visitMultipleArrayAggregate(MultipleArrayAggregate ast, Object o);
   public abstract Object visitSingleArrayAggregate(SingleArrayAggregate ast, Object o);

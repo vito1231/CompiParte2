@@ -47,6 +47,7 @@ import Triangle.AbstractSyntaxTrees.EmptyFormalParameterSequence;
 import Triangle.AbstractSyntaxTrees.ErrorTypeDenoter;
 import Triangle.AbstractSyntaxTrees.FieldTypeDenoter;
 import Triangle.AbstractSyntaxTrees.ForCommand;
+import Triangle.AbstractSyntaxTrees.ForControlVarDeclaration;
 import Triangle.AbstractSyntaxTrees.ForUntilCommand;
 import Triangle.AbstractSyntaxTrees.ForWhileCommand;
 import Triangle.AbstractSyntaxTrees.FormalParameter;
@@ -202,20 +203,34 @@ public final class Checker implements Visitor {
   }
    
     public Object visitForCommand(ForCommand ast, Object o) {
+    
     TypeDenoter eType = (TypeDenoter) ast.E.visit(this, null);
     TypeDenoter e2Type = (TypeDenoter) ast.E2.visit(this, null);
+    
+    //declare const and register on IdTable
+    declareForConst(ast.I.spelling, new IntTypeDenoter(ast.I.position));
+    ast.I.visit(this, null);
+    
+    
     if (! eType.equals(StdEnvironment.integerType))
       reporter.reportError("Integer expression expected here", "", ast.E.position);
     if (! e2Type.equals(StdEnvironment.integerType))
       reporter.reportError("Integer expression expected here", "", ast.E2.position);
+    
     ast.C.visit(this, null);
-    ast.I.visit(this, null);
+    
     return null;
   }
     
   public Object visitForUntilCommand(ForUntilCommand ast, Object o) {
     TypeDenoter eType = (TypeDenoter) ast.E.visit(this, null);
     TypeDenoter e2Type = (TypeDenoter) ast.E2.visit(this, null);
+    
+    //declare const and register on IdTable
+    declareForConst(ast.I.spelling, new IntTypeDenoter(ast.I.position));
+    ast.I.visit(this, null);
+    
+    //expression 3 has acces to control variable
     TypeDenoter e3Type = (TypeDenoter) ast.E3.visit(this, null);
     if (! eType.equals(StdEnvironment.integerType))
       reporter.reportError("Integer expression expected here", "", ast.E.position);
@@ -224,13 +239,19 @@ public final class Checker implements Visitor {
     if (! e3Type.equals(StdEnvironment.booleanType))
       reporter.reportError("Boolean expression expected here", "", ast.E3.position);
     ast.C.visit(this, null);
-    ast.I.visit(this, null);
+    //ast.I.visit(this, null);
     return null;
   }
   
     public Object visitForWhileCommand(ForWhileCommand ast, Object o) {
     TypeDenoter eType = (TypeDenoter) ast.E.visit(this, null);
     TypeDenoter e2Type = (TypeDenoter) ast.E2.visit(this, null);
+    
+    //declare const and register on IdTable
+    declareForConst(ast.I.spelling, new IntTypeDenoter(ast.I.position));
+    ast.I.visit(this, null);
+    
+    //expression 3 has acces to control variable
     TypeDenoter e3Type = (TypeDenoter) ast.E3.visit(this, null);
     if (! eType.equals(StdEnvironment.integerType))
       reporter.reportError("Integer expression expected here", "", ast.E.position);
@@ -239,7 +260,7 @@ public final class Checker implements Visitor {
     if (! e3Type.equals(StdEnvironment.booleanType))
       reporter.reportError("Boolean expression expected here", "", ast.E3.position);
     ast.C.visit(this, null);
-    ast.I.visit(this, null);
+    //ast.I.visit(this, null);
     return null;
   }
  // </editor-fold>
@@ -838,7 +859,10 @@ public final class Checker implements Visitor {
       } else if (binding instanceof VarFormalParameter) {
         ast.type = ((VarFormalParameter) binding).T;
         ast.variable = true;
-      } else
+      }  else if (binding instanceof ForControlVarDeclaration) {
+        ast.type = ((ForControlVarDeclaration) binding).E.type;
+        ast.variable = true;
+      }else
         reporter.reportError ("\"%\" is not a const or var identifier",
                               ast.I.spelling, ast.I.position);
     return ast.type;
@@ -1069,6 +1093,8 @@ public final class Checker implements Visitor {
   
   
   
+  
+  
   //not implemented functions
 
     @Override
@@ -1094,8 +1120,10 @@ public final class Checker implements Visitor {
     
     @Override
     public Object visitChooseCommand(ChooseCommand aThis, Object o) {
+          
         aThis.E.visit(this, null);
         aThis.C.visit(this, null);
+        
         return null;
     }
 
@@ -1152,5 +1180,20 @@ public final class Checker implements Visitor {
         return null;  
     }
 
+    
+    //const tipe for variable in for loop
+    private ForControlVarDeclaration declareForConst (String id, TypeDenoter constType) {
+
+    IntegerExpression constExpr;
+    ForControlVarDeclaration binding;
+
+    // constExpr used only as a placeholder for constType
+    constExpr = new IntegerExpression(null, dummyPos);
+    constExpr.type = constType;
+    binding = new ForControlVarDeclaration(new Identifier(id, dummyPos), constExpr, dummyPos);
+    idTable.enter(id, binding);
+    return binding;
+  }
+    
     
 }
