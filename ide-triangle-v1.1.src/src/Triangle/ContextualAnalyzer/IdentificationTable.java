@@ -19,6 +19,7 @@ import Triangle.AbstractSyntaxTrees.Declaration;
 public final class IdentificationTable {
 
   private int level;
+  private String pack;
   private IdEntry latest;
 
   public IdentificationTable () {
@@ -57,15 +58,18 @@ public final class IdentificationTable {
   // same identifier at the current level.
 
   public void enter (String id, Declaration attr) {
-
+    //if package add package to id
+    System.out.println("Declared: " + id);
     IdEntry entry = this.latest;
     boolean present = false, searching = true;
-
+    
+    String fullId = id;
+    if(pack != null)fullId = pack+"$"+id;
     // Check for duplicate entry ...
     while (searching) {
       if (entry == null || entry.level < this.level)
         searching = false;
-      else if (entry.id.equals(id)) {
+      else if (entry.compareId(fullId)) {
         present = true;
         searching = false;
        } else
@@ -74,7 +78,14 @@ public final class IdentificationTable {
 
     attr.duplicated = present;
     // Add new entry ...
-    entry = new IdEntry(id, attr, this.level, this.latest);
+    if(pack != null){ 
+         entry = new IdEntry(pack, id, attr, this.level, this.latest);
+    }else{
+         entry = new IdEntry(id, attr, this.level, this.latest);
+    }
+    
+    System.out.println("Declared: " + id);
+    
     this.latest = entry;
   }
 
@@ -85,24 +96,41 @@ public final class IdentificationTable {
   // otherwise returns the attribute field of the entry found.
 
   public Declaration retrieve (String id) {
+    
 
     IdEntry entry;
     Declaration attr = null;
     boolean present = false, searching = true;
 
+    
+    
     entry = this.latest;
     while (searching) {
       if (entry == null)
         searching = false;
-      else if (entry.id.equals(id)) {
+      else if (entry.compareId(id)) {
+        present = true;
+        searching = false;
+        attr = entry.attr;
+      }else if (pack != null && entry.compareId(pack+"$"+id)) {
         present = true;
         searching = false;
         attr = entry.attr;
       } else
         entry = entry.previous;
+      
+      //if(entry != null) System.out.println(pack+"$"+id+"----"+ entry.id);
     }
 
     return attr;
   }
-
+  
+  
+  public void startPackage(String pack){
+      this.pack = pack;
+  }
+  
+  public void endPackage(){
+      this.pack = null;
+  }
 }

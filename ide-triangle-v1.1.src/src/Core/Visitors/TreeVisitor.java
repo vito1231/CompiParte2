@@ -387,7 +387,7 @@ public class TreeVisitor implements Visitor {
     }
     
     public Object visitLongIdentifier(LongIdentifier ast, Object obj) {
-        return(createNullary(ast.P.spelling + "$" +ast.spelling));
+        return(createNullary(ast.spelling  + "$" + ast.P.spelling ));
     }
     public Object visitPackageIdentifier(PackageIdentifier ast, Object obj) {
         return(createNullary(ast.spelling));
@@ -421,7 +421,7 @@ public class TreeVisitor implements Visitor {
         return createBinary("Program",ast.D, ast.C);
     }
     public Object visitSinglePackageDeclaration(SinglePackageDeclaration ast, Object o) {
-                return(createUnary("SinglePackageDeclaration", ast.D));
+                return(createBinary("SinglePackageDeclaration",ast.I, ast.D));
     }
     public Object visitSequentialPackageDeclaration(SequentialPackageDeclaration ast, Object o) {
                 return(createBinary("SequentialPackageDeclaration", ast.D,ast.D2));

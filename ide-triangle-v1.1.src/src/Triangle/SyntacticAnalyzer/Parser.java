@@ -218,13 +218,13 @@ public class Parser {
       SourcePosition packagePos = new SourcePosition();
       start(packagePos);
       accept(Token.PACKAGE);
-      parsePackageIdentifier();
+      PackageIdentifier piAst = parsePackageIdentifier();
       accept(Token.IS);
       Declaration dAST = parseDeclaration();
       accept(Token.END);
       accept(Token.SEMICOLON);
       finish(packagePos);
-      packageAST = new SinglePackageDeclaration(dAST, packagePos);
+      packageAST = new SinglePackageDeclaration(piAst,dAST, packagePos);
       
       
       return packageAST;

@@ -779,9 +779,11 @@ public final class Checker implements Visitor {
   }
   //TODO update package to bindings
   public Object visitLongIdentifier(LongIdentifier I, Object o) {
-    Declaration binding = idTable.retrieve(I.spelling);
+    Declaration binding = idTable.retrieve(I.spelling + "$" + I.P.spelling);
     if (binding != null)
       I.decl = binding;
+    else
+        reporter.reportError("\"%\" is not declared", I.spelling + "$" + I.P.spelling, I.position);
     return binding;
   }
   //should revise id Table for packages
@@ -844,6 +846,7 @@ public final class Checker implements Visitor {
     ast.variable = false;
     ast.type = StdEnvironment.errorType;
     Declaration binding = (Declaration) ast.I.visit(this, null);
+    
     if (binding == null)
       reportUndeclared(ast.I);
     else
@@ -888,9 +891,10 @@ public final class Checker implements Visitor {
   // Programs
 
   public Object visitProgram(Program ast, Object o) {
-    ast.C.visit(this, null);
     if(ast.D != null)
     ast.D.visit(this, null);
+    ast.C.visit(this, null);
+    
     return null;
   }
 
@@ -1099,7 +1103,10 @@ public final class Checker implements Visitor {
 
     @Override
     public Object visitSinglePackageDeclaration(SinglePackageDeclaration ast, Object o) {
+            idTable.startPackage(ast.I.spelling);
+            //ast.I.visit(this, null);
             ast.D.visit(this, null);
+            idTable.endPackage();
             return null;
     }
     @Override

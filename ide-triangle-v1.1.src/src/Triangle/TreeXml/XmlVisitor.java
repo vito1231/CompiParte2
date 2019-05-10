@@ -422,7 +422,7 @@ public class XmlVisitor implements Visitor {
 
   // Package
   public Object visitSinglePackageDeclaration(SinglePackageDeclaration ast, Object obj) {
-    return xmlUnary("SinglePackageDeclaration", ast.D);
+    return xmlBinary("SinglePackageDeclaration",ast.I, ast.D);
   }
    
    public Object visitSequentialPackageDeclaration(SequentialPackageDeclaration ast, Object obj) {

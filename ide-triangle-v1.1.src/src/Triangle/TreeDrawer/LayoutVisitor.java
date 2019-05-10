@@ -417,7 +417,7 @@ public class LayoutVisitor implements Visitor {
   
    // Package
    public Object visitSinglePackageDeclaration(SinglePackageDeclaration ast, Object obj) {
-     return layoutUnary("SinglePackageDeclaration", ast.D);
+     return layoutBinary("SinglePackageDeclaration",ast.I, ast.D);
   }
   
   public Object visitSequentialPackageDeclaration(SequentialPackageDeclaration ast, Object obj) {

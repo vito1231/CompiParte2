@@ -668,6 +668,7 @@ public class TableVisitor implements Visitor {
   
   
     public Object visitSinglePackageDeclaration(SinglePackageDeclaration ast, Object o) {
+              ast.I.visit(this, null); 
               ast.D.visit(this, null); 
               return(null);
     }

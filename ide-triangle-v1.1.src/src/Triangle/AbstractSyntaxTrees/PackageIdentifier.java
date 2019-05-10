@@ -12,9 +12,11 @@ public class PackageIdentifier extends Identifier {
   }
   
   public PackageIdentifier (Identifier original) {
+    
     super (original.spelling, original.position);
     type = original.type;
     decl = original.decl;
+    
   }
 
   public Object visit(Visitor v, Object o) {

@@ -18,7 +18,8 @@ import Triangle.AbstractSyntaxTrees.Declaration;
 
 public class IdEntry {
 
-  protected String id;
+  protected String id;  
+  protected String pack;
   protected Declaration attr;
   protected int level;
   protected IdEntry previous;
@@ -28,6 +29,25 @@ public class IdEntry {
     this.attr = attr;
     this.level = level;
     this.previous = previous;
+    pack = "Default";
   }
+  
+  IdEntry ( String pack, String id, Declaration attr, int level, IdEntry previous) {
+    this.id = id;
+    this.attr = attr;
+    this.level = level;
+    this.previous = previous;
+    this.pack = pack;
+  }
+  
+  protected boolean compareId(String id){
+      if(pack != "Default"){
+          String fullId = pack + "$" + this.id;
+          return fullId.equals(id);
+      }
+      return this.id.equals(id);
+  }
+  
 
+  
 }
