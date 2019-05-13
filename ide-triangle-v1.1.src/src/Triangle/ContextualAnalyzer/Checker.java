@@ -64,7 +64,7 @@ import Triangle.AbstractSyntaxTrees.IntegerLiteral;
 import Triangle.AbstractSyntaxTrees.LetCommand;
 import Triangle.AbstractSyntaxTrees.LetExpression;
 import Triangle.AbstractSyntaxTrees.LitIntegerExpression;
-import Triangle.AbstractSyntaxTrees.LiteralCharacterExpression;
+import Triangle.AbstractSyntaxTrees.LitCharacterExpression;
 import Triangle.AbstractSyntaxTrees.LongIdentifier;
 import Triangle.AbstractSyntaxTrees.MultipleActualParameterSequence;
 import Triangle.AbstractSyntaxTrees.MultipleArrayAggregate;
@@ -918,13 +918,13 @@ public final class Checker implements Visitor {
   public Checker (ErrorReporter reporter) {
     this.reporter = reporter;
     this.idTable = new IdentificationTable ();
-    this.literalTable= new LiteralTable();
+    
     establishStdEnvironment();
   }
 
   private IdentificationTable idTable;
   private static SourcePosition dummyPos = new SourcePosition();
-  private LiteralTable literalTable;
+  
   private ErrorReporter reporter;
 
   // Reports that the identifier or operator used at a leaf of the AST
@@ -1123,27 +1123,67 @@ public final class Checker implements Visitor {
     
     @Override
     public Object visitCaseLiteral(CaseLiteral aThis, Object o) {
-        aThis.caselite.visit(this,o);
-        aThis.caselite2.visit(this,o);
-        
+         if(aThis.caselite != null){
+             aThis.caselite.visit(this,o);}
+         aThis.caselite2.visit(this,o);
         return null;    }
     
     
     @Override
     public Object visitChooseCommand(ChooseCommand aThis, Object o) {
           
-        literalTable.openScope();
+        idTable.openScope();
         TypeDenoter eType = (TypeDenoter) aThis.E.visit(this, null);
+        System.out.println(eType.toString());
         if (!eType.equals(StdEnvironment.integerType) && !eType.equals(StdEnvironment.charType)) {
             reporter.reportError("Integer or Char expression expected here", "", aThis.E.position);
         }
-        aThis.C.visit(this, new Tupla(eType, aThis.E.position));
+        aThis.C.visit(this, new TypeTransfer(eType, aThis.E.position));
+        
     
-        literalTable.closeScope();
+        idTable.closeScope();
         return null;
         
         
     }
+    
+     @Override
+    public Object visitLitIntegerExpression(LitIntegerExpression aThis, Object o) {
+        if(!o.equals(null)){
+           TypeTransfer tupla=(TypeTransfer) o;
+           TypeDenoter eType=(TypeDenoter) tupla.x;
+           System.out.println(aThis.IL.spelling);
+            SourcePosition sourcePosition=(SourcePosition) tupla.y;
+            if(!eType.equals(StdEnvironment.integerType)){
+                reporter.reportError ("Character Expression expected here",
+                            "", sourcePosition);
+            }
+            if(idTable.enterLiteral(aThis.IL.spelling)){
+                reporter.reportError("Identifier \"%\" already declared",aThis.IL.spelling, aThis.position);
+            }
+       }
+        return null;
+        
+    }
+    
+    @Override
+    public Object visitLiteralCharacterExpression(LitCharacterExpression aThis, Object o) {
+        if(!o.equals(null)){
+           TypeTransfer tupla=(TypeTransfer) o;
+           TypeDenoter eType=(TypeDenoter) tupla.x;
+            SourcePosition sourcePosition=(SourcePosition) tupla.y;
+            System.out.println(aThis.CL.spelling);
+            if(!eType.equals(StdEnvironment.charType)){
+                reporter.reportError ("Character Expression expected here",
+                            "", sourcePosition);
+            }
+            if(idTable.enterLiteral(aThis.CL.spelling)){
+                reporter.reportError("Identifier \"%\" already declared",aThis.CL.spelling, aThis.position);
+            }
+       }
+        return null;
+    }
+        
 
     @Override
     public Object visitCaseRange(CaseRange aThis, Object o) {
@@ -1214,48 +1254,12 @@ public final class Checker implements Visitor {
     return binding;
   }
 
- @Override
-    public Object visitLitIntegerExpression(LitIntegerExpression aThis, Object o) {
-        if(!o.equals(null)){
-           Tupla tupla=(Tupla) o;
-           TypeDenoter eType=(TypeDenoter) tupla.x;
-            SourcePosition sourcePosition=(SourcePosition) tupla.y;
-            if(!eType.equals(StdEnvironment.integerType)){
-                reporter.reportError ("Character Expression expected here",
-                            "", sourcePosition);
-            }
-            if(literalTable.enter(aThis.IL.spelling)){
-                reporter.reportError("Identifier \"%\" already declared",aThis.IL.spelling, aThis.position);
-            }
-       }
-        return null;
-        
-    }
 
-
-
-    @Override
-    public Object visitLiteralCharacterExpression(LiteralCharacterExpression aThis, Object o) {
-        if(!o.equals(null)){
-           Tupla tupla=(Tupla) o;
-           TypeDenoter eType=(TypeDenoter) tupla.x;
-            SourcePosition sourcePosition=(SourcePosition) tupla.y;
-            if(!eType.equals(StdEnvironment.charType)){
-                reporter.reportError ("Character Expression expected here",
-                            "", sourcePosition);
-            }
-            if(literalTable.enter(aThis.CL.spelling)){
-                reporter.reportError("Identifier \"%\" already declared",aThis.CL.spelling, aThis.position);
-            }
-       }
-        return null;
-    }
-        
-public class Tupla<X,Y>{
+public class TypeTransfer<X,Y>{
     public final X x;
     public final Y y;
     
-    public Tupla(X x,Y y){
+    public TypeTransfer(X x,Y y){
         this.x=x;
         this.y=y;
     }

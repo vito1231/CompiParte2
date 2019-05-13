@@ -110,7 +110,7 @@ public interface Visitor {
   public abstract Object visitIntegerLiteral(IntegerLiteral ast, Object o);
   public abstract Object visitOperator(Operator ast, Object o);
 public abstract Object visitLitIntegerExpression(LitIntegerExpression aThis, Object o);
-  public abstract Object visitLiteralCharacterExpression(LiteralCharacterExpression aThis, Object o);
+  public abstract Object visitLiteralCharacterExpression(LitCharacterExpression aThis, Object o);
   // Value-or-variable names
   public abstract Object visitDotVname(DotVname ast, Object o);
   public abstract Object visitSimpleVname(SimpleVname ast, Object o);

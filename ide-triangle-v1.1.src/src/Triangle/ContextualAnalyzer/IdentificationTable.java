@@ -44,7 +44,7 @@ public final class IdentificationTable {
 
     // Presumably, idTable.level > 0.
     entry = this.latest;
-    while (entry.level == this.level) {
+    while (entry!=null &&entry.level == this.level) {
       local = entry;
       entry = local.previous;
     }
@@ -84,10 +84,32 @@ public final class IdentificationTable {
          entry = new IdEntry(id, attr, this.level, this.latest);
     }
     
-    //System.out.println("Declared: " + id);
+    //System.out.println("Declared: " + id);    
     
     this.latest = entry;
   }
+  
+  public boolean enterLiteral(String id) {
+
+        IdEntry entry = this.latest;
+        boolean present = false, searching = true;
+
+        // Check for duplicate entry ...
+        while (searching) {
+            if (entry == null || entry.level < this.level) {
+                searching = false;
+            } else if (entry.id.equals(id)) {
+                present = true;
+                searching = false;
+            } else {
+                entry = entry.previous;
+            }
+        }
+        // Add new entry ...
+        entry = new IdEntry(id, this.level, this.latest);
+        this.latest = entry;
+        return present;
+    }
 
   // Finds an entry for the given identifier in the identification table,
   // if any. If there are several entries for that identifier, finds the

@@ -13,9 +13,9 @@ import Triangle.SyntacticAnalyzer.SourcePosition;
  *
  * @author vicnb
  */
-public class LiteralCharacterExpression extends Expression {
+public class LitCharacterExpression extends Expression {
    
-  public LiteralCharacterExpression (CharacterLiteral clAST, SourcePosition thePosition) {
+  public LitCharacterExpression (CharacterLiteral clAST, SourcePosition thePosition) {
     super (thePosition);
     CL = clAST;
   }
