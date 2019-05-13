@@ -59,7 +59,7 @@ public final class IdentificationTable {
 
   public void enter (String id, Declaration attr) {
     //if package add package to id
-    System.out.println("Declared: " + id);
+    //System.out.println("Declared: " + id);
     IdEntry entry = this.latest;
     boolean present = false, searching = true;
     
@@ -84,7 +84,7 @@ public final class IdentificationTable {
          entry = new IdEntry(id, attr, this.level, this.latest);
     }
     
-    System.out.println("Declared: " + id);
+    //System.out.println("Declared: " + id);
     
     this.latest = entry;
   }
