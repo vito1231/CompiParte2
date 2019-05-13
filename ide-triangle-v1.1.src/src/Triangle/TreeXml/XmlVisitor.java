@@ -57,6 +57,8 @@ import Triangle.AbstractSyntaxTrees.IntegerExpression;
 import Triangle.AbstractSyntaxTrees.IntegerLiteral;
 import Triangle.AbstractSyntaxTrees.LetCommand;
 import Triangle.AbstractSyntaxTrees.LetExpression;
+import Triangle.AbstractSyntaxTrees.LitIntegerExpression;
+import Triangle.AbstractSyntaxTrees.LiteralCharacterExpression;
 import Triangle.AbstractSyntaxTrees.LongIdentifier;
 import Triangle.AbstractSyntaxTrees.MultipleActualParameterSequence;
 import Triangle.AbstractSyntaxTrees.MultipleArrayAggregate;
@@ -562,5 +564,16 @@ public class XmlVisitor implements Visitor {
   @Override
     public Object visitVarADeclaration(VarADeclaration aThis, Object o) {
         return xmlBinary("VarAsDeclaration", aThis.I, aThis.E);
+    }
+
+    @Override
+    public Object visitLitIntegerExpression(LitIntegerExpression aThis, Object o) {
+        return xmlUnary("litIntegerExpression", aThis.IL);
+    }
+
+
+    @Override
+    public Object visitLiteralCharacterExpression(LiteralCharacterExpression aThis, Object o) {
+        return xmlUnary("litCharacterExpression", aThis.CL);
     }
 }

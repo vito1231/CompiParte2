@@ -109,7 +109,8 @@ public interface Visitor {
   public abstract Object visitPackageIdentifier(PackageIdentifier ast, Object o);
   public abstract Object visitIntegerLiteral(IntegerLiteral ast, Object o);
   public abstract Object visitOperator(Operator ast, Object o);
-
+public abstract Object visitLitIntegerExpression(LitIntegerExpression aThis, Object o);
+  public abstract Object visitLiteralCharacterExpression(LiteralCharacterExpression aThis, Object o);
   // Value-or-variable names
   public abstract Object visitDotVname(DotVname ast, Object o);
   public abstract Object visitSimpleVname(SimpleVname ast, Object o);
@@ -128,6 +129,8 @@ public interface Visitor {
   public abstract Object visitComCase(ComCase aThis, Object o);
   public abstract Object visitElseCase(ElseCase aThis, Object o);
   public abstract Object visitSCase(SCase aThis, Object o);
+
+  
 
     
 
