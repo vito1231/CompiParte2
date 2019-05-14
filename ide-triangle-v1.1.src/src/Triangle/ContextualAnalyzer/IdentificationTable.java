@@ -16,6 +16,7 @@ package Triangle.ContextualAnalyzer;
 
 import Triangle.AbstractSyntaxTrees.Declaration;
 import java.util.ArrayList;
+import java.util.Iterator;
 
 public final class IdentificationTable {
 
@@ -26,12 +27,15 @@ public final class IdentificationTable {
   
   //ugly flag to complete private stuff
   private boolean EndingPrivate;
+  //ugly flag to activate paralel declarations
+  private boolean isParalel;
 
   public IdentificationTable () {
     level = 0;
     latest = null;
     privateList = new ArrayList<>();
     EndingPrivate = false;
+    isParalel = false;
   }
 
   // Opens a new level in the identification table, 1 higher than the
@@ -65,11 +69,16 @@ public final class IdentificationTable {
   // same identifier at the current level.
 
   public void enter (String id, Declaration attr) {
+    if(isParalel) return;
+      
     //if package add package to id
     //System.out.println("Declared: " + id);
     IdEntry entry = this.latest;
     boolean present = false, searching = true;
     
+     
+     
+     
     String fullId = id;
     if(pack != null)fullId = pack+"$"+id;
     // Check for duplicate entry ...
@@ -93,6 +102,7 @@ public final class IdentificationTable {
     
     //System.out.println("Declared: " + id);    
     
+   
     
     
     this.latest = entry;
@@ -196,5 +206,16 @@ public final class IdentificationTable {
       PrivateBlock lastBlock = privateList.remove(privateList.size()-1);
       //remove private variables from identification table
       lastBlock.finishPrivate();
+  }
+  
+  
+  public void startParalel(){
+      isParalel = true;
+  }
+  
+  public void endParalel(){
+      isParalel = false;
+
+      
   }
 }

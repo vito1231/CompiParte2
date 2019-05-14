@@ -1018,16 +1018,20 @@ Vname parseVname () throws SyntaxError {
         case Token.PAR:
         {
             acceptIt();
-            Declaration d1AST=parseSingleDeclaration();
+            Declaration d1AST= parseSingleDeclaration();
             accept(Token.PIPE);
-            Declaration d2AST=parseSingleDeclaration();
+            Declaration d2AST= parseSingleDeclaration();
+            
+            //simple trick to avoid undefined
+            declarationAST = d1AST;
             while(currentToken.kind==Token.PIPE){
                 acceptIt();
-                d2AST= parseSingleDeclaration();
                 declarationAST =new SequentialDeclaration(d1AST, d2AST, declarationPos);
+                d2AST= parseSingleDeclaration();
+                
             }
             accept(Token.END);
-            declarationAST=new ParDeclaration(d1AST, declarationAST, declarationPos);
+            declarationAST=new ParDeclaration(declarationAST, d2AST, declarationPos);
             break;
         }
         default:

@@ -1241,9 +1241,14 @@ public final class Checker implements Visitor {
         idTable.flushPrivate();
         return null;
     }
-
+    
+    //do two pases to check for paralel isolation, but also for name repettition
     @Override
     public Object ParDeclaration(Triangle.AbstractSyntaxTrees.ParDeclaration aThis, Object o) {
+        idTable.startParalel();
+        aThis.D1.visit(this, null);
+        aThis.D2.visit(this, null);
+        idTable.endParalel();
         aThis.D1.visit(this, null);
         aThis.D2.visit(this, null);
         return null;
