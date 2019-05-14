@@ -121,6 +121,7 @@ public final class Checker implements Visitor {
       reporter.reportError ("LHS of assignment is not a variable", "", ast.V.position);
     if (! eType.equals(vType))
       reporter.reportError ("assignment incompatibilty", "", ast.position);
+    
     return null;
   }
 
@@ -207,6 +208,8 @@ public final class Checker implements Visitor {
     TypeDenoter eType = (TypeDenoter) ast.E.visit(this, null);
     TypeDenoter e2Type = (TypeDenoter) ast.E2.visit(this, null);
     
+    //scope for control variable
+    idTable.openScope();
     //declare const and register on IdTable
     declareForConst(ast.I.spelling, new IntTypeDenoter(ast.I.position));
     ast.I.visit(this, null);
@@ -218,7 +221,8 @@ public final class Checker implements Visitor {
       reporter.reportError("Integer expression expected here", "", ast.E2.position);
     
     ast.C.visit(this, null);
-    
+    //finis control variable acces area
+    idTable.closeScope();
     return null;
   }
     
@@ -226,6 +230,7 @@ public final class Checker implements Visitor {
     TypeDenoter eType = (TypeDenoter) ast.E.visit(this, null);
     TypeDenoter e2Type = (TypeDenoter) ast.E2.visit(this, null);
     
+    idTable.openScope();
     //declare const and register on IdTable
     declareForConst(ast.I.spelling, new IntTypeDenoter(ast.I.position));
     ast.I.visit(this, null);
@@ -239,6 +244,8 @@ public final class Checker implements Visitor {
     if (! e3Type.equals(StdEnvironment.booleanType))
       reporter.reportError("Boolean expression expected here", "", ast.E3.position);
     ast.C.visit(this, null);
+    //finis control variable acces area
+    idTable.closeScope();
     //ast.I.visit(this, null);
     return null;
   }
@@ -247,6 +254,7 @@ public final class Checker implements Visitor {
     TypeDenoter eType = (TypeDenoter) ast.E.visit(this, null);
     TypeDenoter e2Type = (TypeDenoter) ast.E2.visit(this, null);
     
+    idTable.openScope();
     //declare const and register on IdTable
     declareForConst(ast.I.spelling, new IntTypeDenoter(ast.I.position));
     ast.I.visit(this, null);
@@ -259,7 +267,10 @@ public final class Checker implements Visitor {
       reporter.reportError("Integer expression expected here", "", ast.E2.position);
     if (! e3Type.equals(StdEnvironment.booleanType))
       reporter.reportError("Boolean expression expected here", "", ast.E3.position);
-    ast.C.visit(this, null);
+    ast.C.visit(this, null);//finis control variable acces area
+    
+    idTable.closeScope();
+    
     //ast.I.visit(this, null);
     return null;
   }
@@ -408,6 +419,7 @@ public final class Checker implements Visitor {
     if (ast.duplicated)
       reporter.reportError ("identifier \"%\" already declared",
                             ast.I.spelling, ast.position);
+    
     return null;
   }
 
@@ -827,6 +839,7 @@ public final class Checker implements Visitor {
   // Returns the TypeDenoter of the Vname. Does not use the
   // given object.
   // <editor-fold defaultstate="collapsed" desc=" Value or variable names ">
+  
   public Object visitDotVname(DotVname ast, Object o) {
     ast.type = null;
     TypeDenoter vType = (TypeDenoter) ast.V.visit(this, null);
@@ -864,7 +877,7 @@ public final class Checker implements Visitor {
         ast.variable = true;
       }  else if (binding instanceof ForControlVarDeclaration) {
         ast.type = ((ForControlVarDeclaration) binding).E.type;
-        ast.variable = true;
+        ast.variable = false;
       }else
         reporter.reportError ("\"%\" is not a const or var identifier",
                               ast.I.spelling, ast.I.position);

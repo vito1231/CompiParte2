@@ -128,9 +128,12 @@ public final class IdentificationTable {
   
   public void startPackage(String pack){
       this.pack = pack;
+  
   }
   
   public void endPackage(){
       this.pack = null;
   }
+  
+  
 }
