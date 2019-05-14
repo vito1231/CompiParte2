@@ -902,7 +902,7 @@ public final class Checker implements Visitor {
         ast.variable = false;
       } else if (binding instanceof VarADeclaration) {
         ast.type = ((VarADeclaration) binding).E.type;
-        ast.variable = false;
+        ast.variable = true;
       }else
         reporter.reportError ("\"%\" is not a const or var identifier",
                               ast.I.spelling, ast.I.position);
