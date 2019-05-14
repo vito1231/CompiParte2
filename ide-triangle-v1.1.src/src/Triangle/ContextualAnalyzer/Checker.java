@@ -63,6 +63,8 @@ import Triangle.AbstractSyntaxTrees.IntegerExpression;
 import Triangle.AbstractSyntaxTrees.IntegerLiteral;
 import Triangle.AbstractSyntaxTrees.LetCommand;
 import Triangle.AbstractSyntaxTrees.LetExpression;
+import Triangle.AbstractSyntaxTrees.LitIntegerExpression;
+import Triangle.AbstractSyntaxTrees.LitCharacterExpression;
 import Triangle.AbstractSyntaxTrees.LongIdentifier;
 import Triangle.AbstractSyntaxTrees.MultipleActualParameterSequence;
 import Triangle.AbstractSyntaxTrees.MultipleArrayAggregate;
@@ -929,11 +931,13 @@ public final class Checker implements Visitor {
   public Checker (ErrorReporter reporter) {
     this.reporter = reporter;
     this.idTable = new IdentificationTable ();
+    
     establishStdEnvironment();
   }
 
   private IdentificationTable idTable;
   private static SourcePosition dummyPos = new SourcePosition();
+  
   private ErrorReporter reporter;
 
   // Reports that the identifier or operator used at a leaf of the AST
@@ -1132,44 +1136,92 @@ public final class Checker implements Visitor {
     
     @Override
     public Object visitCaseLiteral(CaseLiteral aThis, Object o) {
-        aThis.caselite.visit(this,null);
-        aThis.caselite2.visit(this,null);
-        
+         if(aThis.caselite != null){
+             aThis.caselite.visit(this,o);}
+         aThis.caselite2.visit(this,o);
         return null;    }
     
     
     @Override
     public Object visitChooseCommand(ChooseCommand aThis, Object o) {
           
-        aThis.E.visit(this, null);
-        aThis.C.visit(this, null);
+        idTable.openScope();
+        TypeDenoter eType = (TypeDenoter) aThis.E.visit(this, null);
+        System.out.println(eType.toString());
+        if (!eType.equals(StdEnvironment.integerType) && !eType.equals(StdEnvironment.charType)) {
+            reporter.reportError("Integer or Char expression expected here", "", aThis.E.position);
+        }
+        aThis.C.visit(this, new TypeTransfer(eType, aThis.E.position));
         
+    
+        idTable.closeScope();
+        return null;
+        
+        
+    }
+    
+     @Override
+    public Object visitLitIntegerExpression(LitIntegerExpression aThis, Object o) {
+        if(!o.equals(null)){
+           TypeTransfer tupla=(TypeTransfer) o;
+           TypeDenoter eType=(TypeDenoter) tupla.x;
+           System.out.println(aThis.IL.spelling);
+            SourcePosition sourcePosition=(SourcePosition) tupla.y;
+            if(!eType.equals(StdEnvironment.integerType)){
+                reporter.reportError ("Character Expression expected here",
+                            "", sourcePosition);
+            }
+            if(idTable.enterLiteral(aThis.IL.spelling)){
+                reporter.reportError("Identifier \"%\" already declared",aThis.IL.spelling, aThis.position);
+            }
+       }
+        return null;
+        
+    }
+    
+    @Override
+    public Object visitLiteralCharacterExpression(LitCharacterExpression aThis, Object o) {
+        if(!o.equals(null)){
+           TypeTransfer tupla=(TypeTransfer) o;
+           TypeDenoter eType=(TypeDenoter) tupla.x;
+            SourcePosition sourcePosition=(SourcePosition) tupla.y;
+            System.out.println(aThis.CL.spelling);
+            if(!eType.equals(StdEnvironment.charType)){
+                reporter.reportError ("Character Expression expected here",
+                            "", sourcePosition);
+            }
+            if(idTable.enterLiteral(aThis.CL.spelling)){
+                reporter.reportError("Identifier \"%\" already declared",aThis.CL.spelling, aThis.position);
+            }
+       }
         return null;
     }
+        
 
     @Override
     public Object visitCaseRange(CaseRange aThis, Object o) {
-        aThis.caseRange.visit(this,null);
-        aThis.caseRange2.visit(this,null);
+        aThis.caseRange.visit(this,o);
+        aThis.caseRange2.visit(this,o);
         
         return null;    }
 
     @Override
     public Object visitComCase(ComCase aThis, Object o) {
-        aThis.CL.visit(this, null);
-        aThis.C.visit(this, null);
+        aThis.CL.visit(this, o);
+        aThis.C.visit(this, o);
         return null;    
     }
 
     @Override
     public Object visitElseCase(ElseCase aThis, Object o) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+       aThis.C1.visit(this, o);
+       return null;
     }
 
     @Override
     public Object visitSCase(SCase aThis, Object o) {
-        aThis.C1.visit(this, null);
-        aThis.C2.visit(this, null);
+        aThis.C1.visit(this, o);
+        aThis.C2.visit(this, o);
         return null;
     }
     
@@ -1214,6 +1266,16 @@ public final class Checker implements Visitor {
     idTable.enter(id, binding);
     return binding;
   }
+
+
+public class TypeTransfer<X,Y>{
+    public final X x;
+    public final Y y;
     
+    public TypeTransfer(X x,Y y){
+        this.x=x;
+        this.y=y;
+    }
     
+}
 }

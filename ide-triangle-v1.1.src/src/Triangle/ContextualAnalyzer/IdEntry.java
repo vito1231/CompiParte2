@@ -23,6 +23,7 @@ public class IdEntry {
   protected Declaration attr;
   protected int level;
   protected IdEntry previous;
+  
 
   IdEntry (String id, Declaration attr, int level, IdEntry previous) {
     this.id = id;
@@ -38,6 +39,12 @@ public class IdEntry {
     this.level = level;
     this.previous = previous;
     this.pack = pack;
+  }
+  
+  IdEntry(String id, int level, IdEntry previous) {
+    this.id = id;
+    this.level = level;
+    this.previous = previous;
   }
   
   protected boolean compareId(String id){
