@@ -1257,7 +1257,8 @@ public final class Checker implements Visitor {
     @Override
     public Object ProcFuncDeclaration(Triangle.AbstractSyntaxTrees.ProcFuncDeclaration aThis, Object o) {
         aThis.D1.visit(this, null);
-        aThis.D2.visit(this, null);
+        if(aThis.D2!=null){
+        aThis.D2.visit(this, null);}
         return null;  
     }
 
