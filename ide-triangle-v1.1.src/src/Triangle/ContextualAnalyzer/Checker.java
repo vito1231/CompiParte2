@@ -486,13 +486,33 @@ public final class Checker implements Visitor {
   
   @Override
     public Object visitVarADeclaration(VarADeclaration ast, Object o) {
-        TypeDenoter vType = (TypeDenoter) ast.I.visit(this, null);
-        TypeDenoter eType = (TypeDenoter) ast.E.visit(this, null);
         idTable.enter (ast.I.spelling, ast);
+        ast.I.visit(this, null);
+        ast.E.visit(this, null);
+        
          
-        if (! eType.equals(vType))
+        //var assign declaration should not have error type
+        /*if (! eType.equals(vType))
             reporter.reportError ("assignment incompatibilty", "", ast.position);
+        */
         return null;  
+    }
+
+      //not implemented functions
+
+    @Override
+    public Object visitSinglePackageDeclaration(SinglePackageDeclaration ast, Object o) {
+            idTable.startPackage(ast.I.spelling);
+            //ast.I.visit(this, null);
+            ast.D.visit(this, null);
+            idTable.endPackage();
+            return null;
+    }
+    @Override
+    public Object visitSequentialPackageDeclaration(SequentialPackageDeclaration ast, Object o) {
+            ast.D.visit(this, null);
+            ast.D2.visit(this, null);
+            return null;
     }
     
  // </editor-fold>
@@ -880,6 +900,9 @@ public final class Checker implements Visitor {
       }  else if (binding instanceof ForControlVarDeclaration) {
         ast.type = ((ForControlVarDeclaration) binding).E.type;
         ast.variable = false;
+      } else if (binding instanceof VarADeclaration) {
+        ast.type = ((VarADeclaration) binding).E.type;
+        ast.variable = false;
       }else
         reporter.reportError ("\"%\" is not a const or var identifier",
                               ast.I.spelling, ast.I.position);
@@ -1116,23 +1139,7 @@ public final class Checker implements Visitor {
   
   
   
-  //not implemented functions
 
-    @Override
-    public Object visitSinglePackageDeclaration(SinglePackageDeclaration ast, Object o) {
-            idTable.startPackage(ast.I.spelling);
-            //ast.I.visit(this, null);
-            ast.D.visit(this, null);
-            idTable.endPackage();
-            return null;
-    }
-    @Override
-    public Object visitSequentialPackageDeclaration(SequentialPackageDeclaration ast, Object o) {
-            ast.D.visit(this, null);
-            ast.D2.visit(this, null);
-            return null;
-    }
-    
     
     @Override
     public Object visitCaseLiteral(CaseLiteral aThis, Object o) {
@@ -1227,8 +1234,11 @@ public final class Checker implements Visitor {
     
         @Override
     public Object privateDeclaration(Triangle.AbstractSyntaxTrees.PrivateDeclaration aThis, Object o) {
+        idTable.startPrivate();
         aThis.D1.visit(this, null);
+        idTable.endPrivate();
         aThis.D2.visit(this, null);
+        idTable.flushPrivate();
         return null;
     }
 

@@ -15,16 +15,23 @@
 package Triangle.ContextualAnalyzer;
 
 import Triangle.AbstractSyntaxTrees.Declaration;
+import java.util.ArrayList;
 
 public final class IdentificationTable {
 
   private int level;
   private String pack;
   private IdEntry latest;
+  ArrayList<PrivateBlock> privateList;
+  
+  //ugly flag to complete private stuff
+  private boolean EndingPrivate;
 
   public IdentificationTable () {
     level = 0;
     latest = null;
+    privateList = new ArrayList<>();
+    EndingPrivate = false;
   }
 
   // Opens a new level in the identification table, 1 higher than the
@@ -86,7 +93,12 @@ public final class IdentificationTable {
     
     //System.out.println("Declared: " + id);    
     
+    
+    
     this.latest = entry;
+    
+    //private should be updated after new entry is acepted
+    if(EndingPrivate) completePrivate();
   }
   
   public boolean enterLiteral(String id) {
@@ -108,6 +120,8 @@ public final class IdentificationTable {
         // Add new entry ...
         entry = new IdEntry(id, this.level, this.latest);
         this.latest = entry;
+        
+        
         return present;
     }
 
@@ -157,5 +171,30 @@ public final class IdentificationTable {
       this.pack = null;
   }
   
+  //starts a private block
+  public void startPrivate(){
+      PrivateBlock newPrivate = new PrivateBlock(latest);
+      privateList.add(newPrivate);
+  }
   
+  //ends a private block
+
+  public void endPrivate(){
+      EndingPrivate = true;
+  }
+  
+  //private should be updated after new entry is acepted
+  private void completePrivate(){
+      EndingPrivate = false;
+      privateList.get(privateList.size()-1).end = latest;
+      
+  }
+  
+  //removes the last inserted private block
+  public void flushPrivate(){
+      //remove block from list
+      PrivateBlock lastBlock = privateList.remove(privateList.size()-1);
+      //remove private variables from identification table
+      lastBlock.finishPrivate();
+  }
 }
